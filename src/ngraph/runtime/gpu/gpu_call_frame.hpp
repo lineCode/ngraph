@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <cublas_v2.h>
+#include <cublas.h>
 #include <cuda_runtime.h>
 #include <cudnn.h>
 #include <functional>
