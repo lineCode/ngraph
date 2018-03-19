@@ -16,20 +16,28 @@
 
 include(ExternalProject)
 
-if (NGRAPH_CPU_ENABLE AND (${CMAKE_SYSTEM_NAME} MATCHES "Darwin") OR (${CMAKE_SYSTEM_NAME} MATCHES "Windows"))
+if (NGRAPH_CPU_ENABLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     message(FATAL_ERROR "The NGRAPH_USE_PREBUILT_LLVM option is not supported on this platform.")
 endif()
 
 if (NGRAPH_CPU_ENABLE)
     message(STATUS "Fetching LLVM from llvm.org")
 
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        set(DEFAULT_LLVM_TARBALL_URL http://releases.llvm.org/5.0.1/clang+llvm-5.0.1-x86_64-apple-darwin.tar.xz)
+        set(DEFAULT_LLVM_SHA1_HASH c8d6f64eab0074cd7519266ffe6663922be4105f)
+    else()
+        set(DEFAULT_LLVM_TARBALL_URL http://releases.llvm.org/5.0.1/clang+llvm-5.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz)
+        set(DEFAULT_LLVM_SHA1_HASH 2fddf9a90b182fa594786be6923e58f5ead71e9c)
+    endif()
+
     # Override default LLVM binaries
     if(NOT DEFINED LLVM_TARBALL_URL)
-        set(LLVM_TARBALL_URL http://releases.llvm.org/5.0.1/clang+llvm-5.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz)
+        set(LLVM_TARBALL_URL ${DEFAULT_LLVM_TARBALL_URL})
     endif()
 
     if(NOT DEFINED LLVM_SHA1_HASH)
-        set(LLVM_SHA1_HASH 2fddf9a90b182fa594786be6923e58f5ead71e9c)
+        set(LLVM_SHA1_HASH ${DEFAULT_LLVM_SHA1_HASH})
     endif()
 
     # The 'BUILD_BYPRODUCTS' argument was introduced in CMake 3.2.
@@ -135,9 +143,18 @@ if (NGRAPH_CPU_ENABLE)
         LLVMBinaryFormat
         LLVMSupport
         LLVMDemangle
-        tinfo
         z
-        m
-        PARENT_SCOPE)
+        m)
 
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+      set(LLVM_LINK_LIBS
+          ${LLVM_LINK_LIBS}
+          tinfo
+          PARENT_SCOPE)
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+      set(LLVM_LINK_LIBS
+          ${LLVM_LINK_LIBS}
+          curses
+          PARENT_SCOPE)
+    endif()
 endif()
