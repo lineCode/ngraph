@@ -14,29 +14,21 @@
 * limitations under the License.
 *******************************************************************************/
 
-#pragma once
+#include "ngraph/op/atan.hpp"
 
-#include "ngraph/op/util/unary_elementwise_arithmetic.hpp"
+using namespace std;
+using namespace ngraph;
 
-namespace ngraph
+op::Atan::Atan(const shared_ptr<Node>& arg)
+    : UnaryElementwiseArithmetic("Atan", arg)
 {
-    namespace op
+}
+
+shared_ptr<Node> op::Atan::copy_with_new_args(const NodeVector& new_args) const
+{
+    if (new_args.size() != 1)
     {
-        /// \brief Elementwise cosine operation.
-        class Cos : public util::UnaryElementwiseArithmetic
-        {
-        public:
-            /// \brief Constructs a cosine operation.
-            ///
-            /// \param arg Node that produces the input tensor.
-            Cos(const std::shared_ptr<Node>& arg);
-
-            virtual std::shared_ptr<Node>
-                copy_with_new_args(const NodeVector& new_args) const override;
-
-        protected:
-            virtual void generate_adjoints(autodiff::Adjoints& adjoints,
-                                           const std::shared_ptr<Node>& delta) override;
-        };
+        throw ngraph_error("Incorrect number of new arguments");
     }
+    return make_shared<Atan>(new_args.at(0));
 }

@@ -14,29 +14,21 @@
 * limitations under the License.
 *******************************************************************************/
 
-#pragma once
+#include "ngraph/op/equal.hpp"
 
-#include "ngraph/op/util/unary_elementwise_arithmetic.hpp"
+using namespace std;
+using namespace ngraph;
 
-namespace ngraph
+op::Equal::Equal(const shared_ptr<Node>& arg0, const shared_ptr<Node>& arg1)
+    : BinaryElementwiseComparison("Equal", arg0, arg1)
 {
-    namespace op
+}
+
+virtual shared_ptr<Node> op::Equal::copy_with_new_args(const NodeVector& new_args) const override
+{
+    if (new_args.size() != 2)
     {
-        /// \brief Elementwise cosine operation.
-        class Cos : public util::UnaryElementwiseArithmetic
-        {
-        public:
-            /// \brief Constructs a cosine operation.
-            ///
-            /// \param arg Node that produces the input tensor.
-            Cos(const std::shared_ptr<Node>& arg);
-
-            virtual std::shared_ptr<Node>
-                copy_with_new_args(const NodeVector& new_args) const override;
-
-        protected:
-            virtual void generate_adjoints(autodiff::Adjoints& adjoints,
-                                           const std::shared_ptr<Node>& delta) override;
-        };
+        throw ngraph_error("Incorrect number of new arguments");
     }
+    return make_shared<Equal>(new_args.at(0), new_args.at(1));
 }

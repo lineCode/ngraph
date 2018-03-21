@@ -149,6 +149,15 @@ std::vector<std::string> op::Constant::get_value_strings() const
     return rc;
 }
 
+std::shared_ptr<Node> op::Constant::copy_with_new_args(const NodeVector& new_args) const
+{
+    if (new_args.size() != 0)
+    {
+        throw ngraph_error("Incorrect number of new arguments");
+    }
+    return std::make_shared<Constant>(m_element_type, m_shape, m_data);
+}
+
 //
 // We have to open up namespace blocks here to work around a problem with gcc:
 //

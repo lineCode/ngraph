@@ -75,6 +75,11 @@ op::Concat::Concat(const NodeVector& args, size_t concatenation_axis)
     set_value_type_checked(make_shared<TensorViewType>(input_0_element_type, concatenated_shape));
 }
 
+std::shared_ptr<Node> op::Concat::copy_with_new_args(const NodeVector& new_args) const
+{
+    return std::make_shared<Concat>(new_args, m_concatenation_axis);
+}
+
 void op::Concat::generate_adjoints(autodiff::Adjoints& adjoints, const std::shared_ptr<Node>& delta)
 {
     auto concat_result_shape = get_outputs().at(0).get_shape();
